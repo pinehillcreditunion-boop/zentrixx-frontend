@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from './Dashboard.module.css';
+import styles from './DashboardHome.module.css';
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
 import Tab from '../components/Tab';
@@ -91,22 +91,52 @@ function DashboardHome() {
             <SideBar />
             <div className={styles.maindashboard}>
                 <Header home={true} title={'Home'} />
-                <div className={styles.mainscreen}>
-                    <div className={styles.mainscreenleft}>
-                        <Wallet />
-
-                    </div>
-
-                    <div className={styles.mainscreenright}>
-                        <div className={styles.menuContainer}>
-
-                            {menuData.map(data => <MenuCard key={data.icon} data={data} fun={navigateHandler} />)}
-
-
+                <main className={styles.mainscreen}>
+                    <section className={styles.welcomeHero} aria-label="Dashboard welcome">
+                        <div className={styles.heroContent}>
+                            <span className={styles.heroEyebrow}><span className={styles.heroEyebrowDot} /> ZENTRIXX DIGITAL BANKING</span>
+                            <h1>Money moves.<br /><em>Life moves forward.</em></h1>
+                            <p>Everything you need to stay in control, all in one beautifully simple place.</p>
+                            <div className={styles.heroTrust}><span className="material-icons">verified_user</span> Secure banking, built around you</div>
                         </div>
+                        <div className={styles.heroArtwork} aria-hidden="true">
+                            <div className={styles.heroGlow} />
+                            <div className={styles.heroOrbit heroOrbitOne} />
+                            <div className={styles.heroOrbit heroOrbitTwo} />
+                            <div className={styles.heroGlassCard}>
+                                <span className={styles.glassCardBrand}>ZENTRIXX <b>✦</b></span>
+                                <div className={styles.glassCardChip} />
+                                <div className={styles.glassCardDigits}>•••• &nbsp; •••• &nbsp; •••• &nbsp; 2048</div>
+                                <div className={styles.glassCardBottom}><span>PREMIUM ACCOUNT</span><span className={styles.glassCardMark}>◈</span></div>
+                            </div>
+                            <div className={styles.heroFloatBadge}><span className="material-icons">bolt</span><div><strong>Smart & simple</strong><small>Banking, reimagined</small></div></div>
+                        </div>
+                    </section>
 
+                    <div className={styles.dashboardGrid}>
+                        <section className={styles.mainscreenleft}>
+                            <div className={styles.sectionHeading}>
+                                <div><span className={styles.sectionEyebrow}>YOUR FINANCES</span><h2>Wallet overview</h2></div>
+                                <span className={styles.liveBadge}><i /> Live</span>
+                            </div>
+                            <Wallet />
+                        </section>
+
+                        <section className={styles.mainscreenright}>
+                            <div className={styles.sectionHeading}>
+                                <div><span className={styles.sectionEyebrow}>AT YOUR FINGERTIPS</span><h2>Quick actions</h2></div>
+                            </div>
+                            <div className={styles.menuContainer}>
+                                {menuData.map(data => <MenuCard key={data.icon} data={data} fun={navigateHandler} />)}
+                            </div>
+                            <div className={styles.securityCard}>
+                                <div className={styles.securityIcon}><span className="material-icons">shield</span></div>
+                                <div><strong>Your security matters</strong><p>Your banking experience is protected with secure account safeguards.</p></div>
+                                <span className="material-icons securityArrow">arrow_forward</span>
+                            </div>
+                        </section>
                     </div>
-                </div>
+                </main>
 
 
             </div>

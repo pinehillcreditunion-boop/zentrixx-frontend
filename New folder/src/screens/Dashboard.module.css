@@ -741,3 +741,140 @@ table td {
 
 
 }
+/* Zentrixx responsive dashboard refresh */
+.screenContainer {
+    min-height: 100vh;
+    height: auto;
+    width: 100%;
+    overflow: hidden;
+    background: #f4f7fb;
+}
+.screenContainer .maindashboard {
+    width: calc(100% - 248px);
+    min-width: 0;
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    flex: 1 1 auto;
+}
+.mainscreen {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 26px clamp(18px, 3vw, 42px) 48px;
+}
+.mainscreenleft {
+    width: 100%;
+    min-width: 0;
+    padding: 0;
+}
+.greeting { margin: 5px 0 22px; }
+.greeting h2 {
+    margin: 0;
+    color: #7b8798;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.25px;
+}
+.chartSection, .summarySection, .helpCard, .passportContainer, .summary {
+    border: 1px solid #e8edf4;
+    border-radius: 16px;
+    box-shadow: 0 8px 26px rgba(8, 27, 58, .045);
+}
+.chartSection {
+    padding: 22px 24px;
+    margin: 0 0 14px;
+    background: linear-gradient(135deg, #fff 0%, #fbfcff 100%);
+}
+.bankInfoCon { display: flex; flex-direction: column; gap: 8px; }
+.bankInfo { padding: 2px 0; }
+.bankInfo:first-child { justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; }
+.bankInfo .accountType { color: #7b8798; font-size: 12px; font-weight: 700; overflow-wrap: anywhere; }
+.bankInfo .accountBalance { color: #10284b; font-family: 'Manrope', sans-serif; font-size: clamp(25px, 3vw, 34px); font-weight: 800; letter-spacing: -1px; }
+.buttonCon { margin: 6px 0 22px; padding: 0; }
+.button {
+    width: auto;
+    min-height: 43px;
+    padding: 0 17px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #dce5f0;
+    border-radius: 10px;
+    background: #fff;
+    color: #173f76;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(8,27,58,.04);
+}
+.button:hover { background: #f3f7fc; }
+.metricsContainer { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 20px 0 24px; }
+.metrics {
+    width: auto;
+    margin: 0;
+    padding: 20px;
+    border: 1px solid #e8edf4;
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 8px 24px rgba(8,27,58,.035);
+    text-align: left;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.metrics:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(8,27,58,.08); }
+.metrics .title { color: #77849a; font-size: 12px; font-weight: 700; }
+.metrics .number { margin-top: 8px; color: #10284b; font-size: 29px; font-weight: 800; }
+.summaryContainer { display: grid; grid-template-columns: minmax(190px, .75fr) minmax(0, 1.5fr); gap: 14px; align-items: stretch; margin: 0 0 24px; }
+.passportContainer, .summary { width: auto; margin: 0; padding: 22px; background: #fff; }
+.passportContainer h4, .summary h4 { margin: 0 0 18px; color: #10284b; font-size: 15px; font-weight: 800; }
+.imgContainer { width: 100%; max-width: 180px; padding: 0; border: 0; }
+.img { width: 100%; max-height: 190px; object-fit: cover; border-radius: 12px; }
+.summary p { margin: 0; padding: 12px 0; border-bottom: 1px solid #edf1f6; color: #526176; font-size: 13px; overflow-wrap: anywhere; }
+.summary p:last-child { border-bottom: 0; }
+.summary p span { color: #8995a6; font-weight: 700; }
+.helpCard { margin: 0 0 26px; padding: 20px; background: #fff; }
+.helpCard .header { padding: 0 0 15px; }
+.helpCard .header h4 { margin: 0; color: #10284b; font-size: 17px; font-weight: 800 !important; }
+.body { width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; }
+.transactionTable { width: 100% !important; min-width: 680px; border-collapse: separate; border-spacing: 0; }
+.transactionTable th { background: #f7f9fc; color: #78869a; font-size: 10px; font-weight: 800 !important; letter-spacing: .7px; white-space: nowrap; }
+.transactionTable td { font-size: 12px; white-space: nowrap; }
+.transactionTable th, .transactionTable td { height: auto; padding: 15px 14px; border-bottom: 1px solid #edf1f6 !important; }
+.cardContainer { display: flex; justify-content: center; margin: 18px 0 22px; }
+.inputContainer { width: 100%; max-width: 420px; margin: 0 0 28px; }
+.inputContainer label { display: block; color: #526176; font-size: 13px; font-weight: 700; }
+.inputContainer input { width: 100%; }
+
+@media (max-width: 1024px) {
+    .screenContainer .maindashboard { width: calc(100% - 210px); }
+    .mainscreen { padding: 22px 20px 40px; }
+}
+@media (max-width: 767px) {
+    .screenContainer { display: block; min-height: 100vh; height: auto; }
+    .screenContainer .maindashboard { width: 100%; height: 100vh; min-height: 100vh; }
+    .mainscreen { padding: 20px 16px 36px; }
+    .mainscreenleft { width: 100%; }
+    .summaryContainer { grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); }
+    .metricsContainer { gap: 10px; }
+    .metrics { padding: 16px; }
+    .metrics .number { font-size: 25px; }
+}
+@media (max-width: 560px) {
+    .mainscreen { padding: 18px 13px 30px; }
+    .chartSection { padding: 18px; }
+    .metricsContainer { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .metrics { padding: 13px 9px; text-align: center; }
+    .metrics .title { font-size: 10px; }
+    .metrics .number { font-size: 22px; }
+    .summaryContainer { grid-template-columns: 1fr; }
+    .passportContainer { display: grid; grid-template-columns: 1fr 100px; align-items: center; gap: 12px; }
+    .passportContainer h4 { margin: 0; }
+    .imgContainer { width: 100px; }
+    .img { max-height: 110px; }
+    .helpCard { padding: 15px 12px; }
+    .greeting h2 { font-size: 11px; }
+}
+@media (max-width: 360px) {
+    .metricsContainer { grid-template-columns: 1fr; }
+    .metrics { display: flex; align-items: center; justify-content: space-between; text-align: left; }
+    .metrics .number { margin: 0; }
+    .bankInfo:first-child { align-items: flex-start; flex-direction: column; gap: 0; }
+}

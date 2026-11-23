@@ -319,3 +319,48 @@
 .withdraw { background: var(--brand-blue); border-radius: 999px; box-shadow: 0 6px 14px rgba(29,79,145,.18); }
 .deposit { color: var(--brand-navy); border: 1px solid var(--line); border-radius: 999px; }
 .notification span { color: var(--muted); }
+
+/* Responsive authenticated header */
+.header { z-index: 30; }
+.innerheader { min-width: 0; padding: 0 24px; }
+.innerheaderleft { min-width: 0; }
+.innerheaderleft h2 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.innerheaderright { width: auto; gap: 18px; }
+.innerheaderrightbutton { width: auto; }
+.deposit { width: auto; min-width: 104px; padding: 0 18px; border-radius: 10px; }
+.hamburger {
+    display: none;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #e5eaf1;
+    border-radius: 11px;
+    background: #fff;
+    color: #10284b;
+    cursor: pointer;
+}
+.mobilemenu { top: 65px; left: auto; right: 14px; width: min(280px, calc(100vw - 28px)); padding: 9px; border: 1px solid #e7ecf3; border-radius: 14px; box-shadow: 0 18px 45px rgba(8,27,58,.14); z-index: 50; }
+.mobilemenu .item { padding: 12px 13px; border-radius: 8px; border-bottom: 0; color: #40516a; font-size: 13px; font-weight: 650; }
+.mobilemenu .item:hover { background: #f2f6fb; color: #12396f; }
+.mobilemenu .signout { margin-top: 5px; background: #fff5f4; color: #b23d45; }
+.mobilemenu .signout:hover { background: #ffebea; color: #9c2831; }
+@media (max-width: 767px) {
+    .innerheader { padding: 0 16px; }
+    .innerheaderleft { width: auto; flex: 1; }
+    .innerheaderright { width: auto; gap: 13px; }
+    .innerheaderrightbutton { display: none; }
+    .hamburger { display: inline-flex; }
+    .mobilemenu { display: block; }
+}
+@media (max-width: 400px) {
+    .innerheader { padding: 0 12px; }
+    .innerheaderleft h2 { font-size: 1.05rem; }
+    .notification span { font-size: 1.55rem; }
+    .mobilemenu { right: 10px; }
+}
+@media (max-width: 767px) {
+    .mobilemenu { opacity: 0; visibility: hidden; transform: translateY(-8px); pointer-events: none; transition: opacity .18s ease, transform .18s ease, visibility .18s ease; }
+    .mobilemenu.showmenu { top: 65px; opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
+}

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import styles from './Header.module.css';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 
 
 
 function Header({ home, title }) {
     let [isShowMenu, setIsShowMenu] = useState(false);
-    let { user } = useSelector(state => state.userAuth)
+    let dispatch = useDispatch()
 
 
     let menuHandler = () => {
@@ -23,12 +23,22 @@ function Header({ home, title }) {
 
 
     let navigateHandler = (data) => {
+        setIsShowMenu(false)
         navigate(`/${data}`)
     }
 
 
     let notificationHandler = () => {
         navigate('/notifications')
+    }
+
+    let signOutHandler = () => {
+        localStorage.removeItem('user')
+        localStorage.removeItem('user_token')
+        localStorage.removeItem('user_expiry')
+        dispatch({ type: 'LOGOUT_USER' })
+        setIsShowMenu(false)
+        navigate('/login', { replace: true })
     }
 
     return (<div className={styles.header}>
@@ -54,7 +64,7 @@ function Header({ home, title }) {
                 {/*<div className={styles.headerImage}>
                     <img src={user.profilePhotoUrl} alt='' />
                 </div>*/}
-                {home ? <span className={`material-icons ${styles.hamburger}`} onClick={menuHandler}>menu</span> : ""}
+                {home ? <button type="button" className={styles.hamburger} onClick={menuHandler} aria-label="Toggle dashboard navigation" aria-expanded={isShowMenu}><span className="material-icons">{isShowMenu ? 'close' : 'menu'}</span></button> : ""}
 
 
             </div>
@@ -99,9 +109,8 @@ function Header({ home, title }) {
 
             </li>
 
-            <li className={styles.item} onClick={() => navigateHandler('login')}>
-                Logout
-
+            <li className={`${styles.item} ${styles.signout}`} onClick={signOutHandler}>
+                Sign out
             </li>
 
 

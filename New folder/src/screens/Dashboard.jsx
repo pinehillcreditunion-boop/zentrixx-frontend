@@ -204,14 +204,14 @@ function Dashboard() {
                     <div className={styles.mainscreenleft}>
 
                         <div className={styles.greeting}>
-                            <h2>GOOD {day()}, {user.firstName}!</h2>
+                            <h2>GOOD {day()}, {user?.firstName || 'WELCOME'}!</h2>
 
                         </div>
 
 
 
 
-                        {isAccount.map(data => <div className={styles.chartSection}>
+                        {isAccount.map(data => <div className={styles.chartSection} key={data._id || data.accountNumber}>
 
                             <div className={styles.bankInfoCon}>
 
@@ -235,7 +235,7 @@ function Dashboard() {
 
 
 
-                        {cards.length > 0 && cards.map(data=><div key={data._id}>
+                        {cards?.length > 0 && cards.map(data=><div key={data._id}>
                             <div className={styles.cardContainer}>
                                 <Cards
                                     number={data.cardNumber}
@@ -264,7 +264,7 @@ function Dashboard() {
                         <div className={styles.metricsContainer}>
                             <div className={styles.metrics} onClick={() => menuHandler('transaction-history')}>
                                 <h5 className={styles.title}>Transactions</h5>
-                                <p className={styles.number}>{histories.length}</p>
+                                <p className={styles.number}>{histories?.length || 0}</p>
                             </div>
 
 
@@ -272,12 +272,12 @@ function Dashboard() {
 
                             <div className={styles.metrics} onClick={() => menuHandler('card')}>
                                 <h5 className={styles.title}>Cards</h5>
-                                <p className={styles.number}>{cards.length}</p>
+                                <p className={styles.number}>{cards?.length || 0}</p>
                             </div>
 
                             <div className={styles.metrics} onClick={() => menuHandler('loan')}>
                                 <h5 className={styles.title} >Loans</h5>
-                                <p className={styles.number}>{loans.length}</p>
+                                <p className={styles.number}>{loans?.length || 0}</p>
                             </div>
 
 
@@ -294,7 +294,7 @@ function Dashboard() {
                                 <h4>Account Passport</h4>
 
                                 <div className={styles.imgContainer}>
-                                    <img src={user.passportUrl} className={styles.img} />
+                                    <img src={user?.passportUrl} className={styles.img} alt="Account profile" />
                                 </div>
 
 
@@ -302,11 +302,11 @@ function Dashboard() {
                             </div>
                             <div className={styles.summary}>
                                 <h4>Basic Info</h4>
-                                <p><span>Account Name: </span>{user.firstName} {user.lastName}</p>
+                                <p><span>Account Name: </span>{user?.firstName} {user?.lastName}</p>
 
-                                <p><span>Country:</span> {user.country}</p>
+                                <p><span>Country:</span> {user?.country || '—'}</p>
 
-                                <p><span>Account status:</span> {user.accountVerified === false ? 'inactive' : 'active'}</p>
+                                <p><span>Account status:</span> {user?.accountVerified === false ? 'inactive' : 'active'}</p>
                             </div>
 
                         </div>
@@ -334,7 +334,7 @@ function Dashboard() {
 
                             <div className={styles.body}>
 
-                                <table style={{ width: '600px' }}>
+                                <table className={styles.transactionTable}>
                                     <thead>
                                         <tr>
                                             <th style={{ fontWeight: '300' }}>
@@ -368,7 +368,7 @@ function Dashboard() {
                                     </thead>
                                     <tbody>
 
-                                        {isDeposits && isDeposits.map(data => <tr>
+                                        {isDeposits && isDeposits.map(data => <tr key={data._id || `${data.date}-${data.amount}-${data.reason}`}>
                                             <td>
                                                 <span className={styles.bullet} style={{ backgroundColor: data.status === 'active' ? 'rgb(76, 149, 76)' : 'rgb(179, 179, 179)' }}></span>{data.status === 'active' ? 'complete' : 'Pending'}
                                             </td>

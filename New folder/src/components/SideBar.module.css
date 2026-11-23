@@ -128,3 +128,22 @@
 .sideBar .menu:hover { background: #f1f5fa !important; color: var(--brand-blue); }
 .sideBar .menu span { color: var(--brand-blue); }
 .sideBar .menu p { color: #526176; font-weight: 600; }
+
+/* Desktop navigation rail sizing */
+.sideBar {
+    flex: 0 0 248px;
+    width: 248px;
+    min-width: 0;
+    padding: 22px 12px;
+    overflow-y: auto;
+}
+.sideBar .sideBarMenu { margin: 0; }
+.sideBar .menu { width: 100%; min-height: 44px; align-items: center; margin: 4px 0; padding: 11px 13px; border-radius: 10px; }
+.sideBar .menu p { margin: 0; font-size: 13px; }
+.sideBar .menu span { width: 22px; margin-right: 12px; font-size: 20px; }
+@media (max-width: 1024px) {
+    .sideBar { flex-basis: 210px; width: 210px; padding-left: 10px; padding-right: 10px; }
+}
+@media (max-width: 767px) {
+    .sideBar { display: none; }
+}

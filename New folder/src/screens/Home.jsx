@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import styles from './Home.module.css';
 
 const HomePage = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { userToken } = useSelector((state) => state.userAuth);
 
   const features = [
     {
@@ -54,8 +56,8 @@ const HomePage = () => {
           <a href="/faq">Support</a>
 
           <div className={styles.navActions}>
-            <a className={styles.signIn} href="/login">
-              Sign in
+            <a className={styles.signIn} href={userToken ? '/dashboard' : '/login'}>
+              {userToken ? 'Dashboard' : 'Sign in'}
             </a>
 
             <a className={styles.getStarted} href="/signup">
@@ -128,7 +130,7 @@ const HomePage = () => {
     <div className={styles.balanceLabel}>TOTAL AVAILABLE</div>
 
     <div className={styles.balanceValue}>
-      ₦ 2,480,650<span>.00</span>
+      $ 2,480,650<span>.00</span>
     </div>
 
     <div className={styles.balanceMeta}>
@@ -171,7 +173,7 @@ const HomePage = () => {
         <small>Today · 10:42 AM</small>
       </div>
 
-      <strong className={styles.amountOut}>− ₦25,000</strong>
+      <strong className={styles.amountOut}>− $25,000</strong>
     </div>
 
     <div className={styles.activityRow}>
@@ -184,7 +186,7 @@ const HomePage = () => {
         <small>Today · 8:15 AM</small>
       </div>
 
-      <strong className={styles.amountIn}>+ ₦450,000</strong>
+      <strong className={styles.amountIn}>+ $450,000</strong>
     </div>
   </div>
 
@@ -222,7 +224,7 @@ const HomePage = () => {
 
       <div>
         <b>Transfer successful</b>
-        <small>₦125,000 sent securely</small>
+        <small>$125,000 sent securely</small>
       </div>
     </div>
   </div>
