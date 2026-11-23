@@ -1,0 +1,235 @@
+/*poppins font import stays here*/
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+::placeholder {
+  font-size: 1rem;
+  padding-left: 10px;
+  text-align: left;
+  width:100%;
+  color:rgb(134, 134, 134);
+}
+
+
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active{
+  -webkit-box-shadow:0 0 0 30px white inset !important
+}
+
+
+
+/*animation code*/
+.loaders {
+  background-color: rgb(235, 255, 235);
+  width:220px;
+  height:220px;
+  border-radius:120%;
+  animation: load infinite 3s linear;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.loader-inner{
+  width:170px;
+  height:170px;
+  background-color: rgb(220, 255, 220);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius:100%;
+}
+
+.loader-inner-inner{
+  width:120px;
+  height:120px;
+  background-color: #12396f;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius:100%;
+  
+}
+
+
+.loaders span{
+  color:#fff;
+  font-size: 3rem;
+}
+
+@keyframes load {
+
+  0% {
+    width:120px;
+    height:120px; border-radius:100%;
+  }
+
+  10% {
+    width:140px;
+    height:140px; border-radius:100%;
+  }
+
+  20% {
+    width:160px;
+    height:160px; border-radius:100%;
+  }
+
+  30% {
+    width:180px;
+    height:180px; border-radius:100%;
+  }
+
+  40% {
+    width:200px;
+    height:200px; border-radius:100%;
+  }
+
+  50% {
+    width:220px;
+    height:220px; border-radius:100%;
+  }
+
+  60% {
+    width:200px;
+    height:200px; border-radius:100%;
+  }
+
+  70% {
+    width: 180px;
+    height:180px; border-radius:100%;
+  }
+
+  80% {
+    width:160px;
+    height:160px; border-radius:100%;
+  }
+
+  90% {
+    width:140px;
+    height:140px; border-radius:100%;
+  }
+
+  100% {
+    width:120px;
+    height:120px; border-radius:100%;
+  }
+}
+
+/* Zentrixx visitor experience: consistent responsive navigation and branded loading. */
+:root { --zx-navy:#071735; --zx-blue:#12396f; --zx-gold:#d8ad42; --zx-ink:#17243b; --zx-muted:#68758a; }
+body { color:var(--zx-ink); }
+.navbar-area { position:relative; z-index:100; background:#fff; box-shadow:0 5px 24px rgba(7,23,53,.06); }
+.navbar-area .luvion-nav { display:block; }
+.navbar-area .navbar { min-height:88px; display:flex; align-items:center; justify-content:space-between; }
+.navbar-area .navbar-brand img { max-height:64px; width:auto; object-fit:contain; }
+.navbar-area .navbar-brand img + img, .navbar-area .logo img + img { display:none; }
+.navbar-area .navbar-nav { display:flex; align-items:center; gap:5px; }
+.navbar-area .navbar-nav > .nav-item > .nav-link { color:#43516a; font-size:12px; font-weight:700; letter-spacing:.45px; padding:16px 13px; transition:color .2s ease; }
+.navbar-area .navbar-nav > .nav-item > .nav-link:hover, .navbar-area .navbar-nav > .nav-item > .nav-link.active { color:var(--zx-blue); }
+.navbar-area .navbar-nav .dropdown-menu { border:1px solid #e8edf4; border-radius:10px; box-shadow:0 18px 40px rgba(7,23,53,.12); padding:8px; }
+.navbar-area .navbar-nav .dropdown-menu .nav-link { border-radius:6px; color:#43516a; font-size:12px; padding:11px 14px; }
+.navbar-area .others-options .login-btn { display:inline-flex; align-items:center; justify-content:center; border-radius:6px; background:var(--zx-navy); color:#fff; padding:14px 18px; font-size:11px; letter-spacing:.5px; }
+.visitor-menu-toggle { display:none; position:absolute; top:16px; right:20px; z-index:5; border:0; background:var(--zx-navy); color:#fff; width:44px; height:44px; border-radius:8px; cursor:pointer; font-size:19px; align-items:center; justify-content:center; }
+.visitor-mobile-menu { display:none; }
+.preloader { position:fixed; inset:0; z-index:99999; display:flex; align-items:center; justify-content:center; background:#f7f9fc; }
+.preloader .loader { width:72px; height:72px; position:relative; display:grid; place-items:center; }
+.preloader .loader:before { content:'Z'; display:grid; place-items:center; width:52px; height:52px; border-radius:15px; background:linear-gradient(145deg,#173e78,#071735); color:#e5bd59; font:800 28px/1 'Manrope',sans-serif; box-shadow:0 10px 30px rgba(7,23,53,.18); animation:zx-pulse 1.25s ease-in-out infinite; }
+.preloader .loader .box, .preloader .loader .shadow { display:none; }
+@keyframes zx-pulse { 0%,100% { transform:scale(.94); opacity:.85 } 50% { transform:scale(1.04); opacity:1 } }
+.page-title-area { background-color:var(--zx-navy); /*background-image:linear-gradient(105deg,rgba(7,23,53,.96),rgba(15,51,98,.82)),url('./assets/main-banner2.jpg') !important;*/background-position:center; background-size:cover; }
+.page-title-area .page-title-content h2 { color:#fff; font-weight:800; letter-spacing:-.8px; }
+.page-title-area .page-title-content p { color:#d6dfed; }
+.footer-area { background:#071735; color:#d5deeb; }
+.footer-area .single-footer-widget h3 { color:#fff; }
+.footer-area .single-footer-widget p, .footer-area .list a, .footer-area .footer-contact-info, .footer-area .copyright-area { color:#b7c4d8; }
+.footer-area .list a:hover { color:#e2bb58; }
+@media (max-width: 991px) {
+ .navbar-area .navbar { min-height:76px; }
+ .navbar-area .luvion-nav .navbar { flex-wrap:wrap; }
+ .navbar-area .navbar-collapse { display:none !important; }
+ .visitor-menu-toggle { display:inline-flex; margin-left:auto; }
+ .visitor-mobile-menu { display:block; position:absolute; top:100%; left:0; right:0; max-height:0; overflow:hidden; opacity:0; visibility:hidden; background:#fff; box-shadow:0 18px 28px rgba(7,23,53,.12); transition:max-height .28s ease,opacity .2s ease,visibility .2s ease; }
+ .visitor-mobile-menu.is-open { max-height:80vh; opacity:1; visibility:visible; overflow-y:auto; }
+ .visitor-mobile-menu ul { list-style:none; margin:0; padding:12px 6% 20px; display:flex; flex-direction:column; gap:0; }
+ .visitor-mobile-menu li { border-bottom:1px solid #edf0f5; padding:0; }
+ .visitor-mobile-menu li a { display:block; padding:13px 4px; color:#24344f; font-size:13px; font-weight:700; text-decoration:none; }
+ .visitor-mobile-menu li:last-child { display:flex; gap:12px; border:0; padding-top:12px; }
+ .visitor-mobile-menu li:last-child a { flex:1; text-align:center; border-radius:6px; background:#071735; color:#fff; }
+ .visitor-mobile-menu li:last-child a + a { background:#d8ad42; color:#071735; }
+}
+@media (max-width: 575px) {
+ .navbar-area .container { padding-left:20px; padding-right:20px; }
+ .navbar-area .navbar-brand img, .navbar-area .logo img { max-height:54px; max-width:185px; }
+ .page-title-area { padding:85px 0 65px; }
+ .page-title-area .page-title-content h2 { font-size:32px; }
+}
+
+
+/* --------------------------------------------------------------------------
+   ZENTRIXX DESIGN SYSTEM — unified visitor, authentication & banking app UI
+   -------------------------------------------------------------------------- */
+:root {
+  --zx-navy: #081b3a;
+  --zx-navy-2: #102d59;
+  --zx-blue: #1d4f91;
+  --zx-blue-soft: #eaf1fb;
+  --zx-gold: #d6ad55;
+  --zx-gold-soft: #fbf5e8;
+  --zx-ink: #17253d;
+  --zx-muted: #718096;
+  --zx-line: #e7ecf3;
+  --zx-surface: #ffffff;
+  --zx-canvas: #f5f7fb;
+  --zx-success: #16835d;
+  --zx-danger: #c84d56;
+  --zx-radius: 16px;
+  --zx-shadow: 0 12px 34px rgba(13, 35, 69, .07);
+}
+html { scroll-behavior: smooth; }
+body {
+  color: var(--zx-ink);
+  background: var(--zx-canvas);
+  font-family: 'Manrope', 'Poppins', Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: -.01em;
+}
+button, input, select, textarea { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+a { transition: color .2s ease, background .2s ease, border-color .2s ease, transform .2s ease; }
+::selection { background: rgba(214,173,85,.25); color: var(--zx-navy); }
+:focus-visible { outline: 3px solid rgba(29,79,145,.3); outline-offset: 2px; }
+.App { min-height: 100vh; }
+
+
+/* Zentrixx visual system — shared refinements across legacy screens */
+:root { --color-blue: var(--brand-blue); --color-white: #fff; --fadeText: var(--muted); }
+body { background: var(--canvas); color: var(--ink); }
+button, input[type="submit"], [role="button"] { transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease; }
+button:hover, input[type="submit"]:hover { filter: brightness(1.035); }
+button:active, input[type="submit"]:active { transform: translateY(1px); }
+input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+  border: 1px solid var(--line) !important;
+  border-radius: 10px !important;
+  background-color: #fbfcfe !important;
+  color: var(--ink);
+  transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--brand-blue) !important;
+  box-shadow: 0 0 0 3px rgba(29,79,145,.10) !important;
+  background: #fff !important;
+  outline: none;
+}
+::placeholder { color: #9aa6b6 !important; opacity: 1; }
+a { text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.material-icons { vertical-align: middle; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
