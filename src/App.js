@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate } from "react-router-dom";
 
 import "./App.css";
 import "./brand-polish.css";
@@ -19,15 +19,6 @@ const Savings = React.lazy(() => import("./screens/Savings"));
 const Login = React.lazy(() => import("./screens/Login"));
 const Signup = React.lazy(() => import("./screens/Signup"));
 
-const EmailVerify = React.lazy(() => import("./screens/EmailVerify"));
-const EmailVerifification = React.lazy(() =>
-  import("./screens/EmailVerifification")
-);
-
-const RegisterationPage = React.lazy(() =>
-  import("./screens/Registeration")
-);
-
 const ForgetPassword = React.lazy(() =>
   import("./screens/ForgetPassword")
 );
@@ -36,14 +27,7 @@ const ResetPassword = React.lazy(() =>
   import("./screens/ResetPassword")
 );
 
-const PhoneSignup = React.lazy(() => import("./screens/PhoneSignup"));
-const PhoneVerification = React.lazy(() =>
-  import("./screens/PhoneVerification")
-);
-
 const Sucess = React.lazy(() => import("./screens/Sucess"));
-const ProfilePhoto = React.lazy(() => import("./screens/ProfilePhoto"));
-
 const Dashboard = React.lazy(() => import("./screens/Dashboard"));
 const Transfer = React.lazy(() => import("./screens/FundTransfer"));
 const BillPay = React.lazy(() => import("./screens/BillPay"));
@@ -112,10 +96,10 @@ function App() {
           <Route path="/signup" element={<Signup />} />
 
           {/* Registration and verification flows */}
-          <Route path="/verify/:id" element={<EmailVerify />} />
+          <Route path="/verify/:id" element={<Navigate to="/login" replace />} />
           <Route
             path="/verification/:id"
-            element={<EmailVerifification />}
+            element={<Navigate to="/login" replace />}
           />
 
           
@@ -130,10 +114,10 @@ function App() {
             element={<ResetPassword />}
           />
 
-          <Route path="/phonesignup" element={<PhoneSignup />} />
+          <Route path="/phonesignup" element={<Navigate to="/login" replace />} />
           <Route
             path="/phoneverification"
-            element={<PhoneVerification />}
+            element={<Navigate to="/login" replace />}
           />
 
           <Route path="/success" element={<Sucess />} />
@@ -146,11 +130,11 @@ function App() {
 
           <Route
             path="/registeration"
-            element={<RegisterationPage />}
+            element={<Navigate to="/dashboard" replace />}
           />
 
             {/* Dashboard */}
-            <Route path="/profilephoto" element={<ProfilePhoto />} />
+            <Route path="/profilephoto" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/home" element={<Dashboard />} />
 

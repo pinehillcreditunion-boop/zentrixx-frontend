@@ -68,3 +68,10 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+## Updated signup experience
+
+Signup is now a four-step in-page carousel. It collects name, email, password, phone, government ID number and residential address without navigating between routes. Email verification and phone verification are not required during signup. After account creation, users are signed in and sent directly to the dashboard.
+
+Users upload their government ID photo and profile photo from the dashboard. The frontend requests short-lived S3 upload URLs from the backend and does not use AWS secret keys in the browser.

@@ -11,6 +11,7 @@ import { fetchDeposits, fetchAccounts } from '../store/action/userAppStorage';
 import Modal from '../components/Modal/Modal';
 import Loader from '../components/loader';
 import Cards from 'react-credit-cards-2';
+import IdentityDocuments from '../components/IdentityDocuments';
 import 'react-credit-cards-2/dist/es/styles-compiled.css'
 
 
@@ -207,6 +208,8 @@ function Dashboard() {
                             <h2>GOOD {day()}, {user?.firstName || 'WELCOME'}!</h2>
 
                         </div>
+
+                        <IdentityDocuments />
 
 
 

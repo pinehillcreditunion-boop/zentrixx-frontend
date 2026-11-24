@@ -43,93 +43,101 @@ let retrievedAdminStoredToken = () => {
   }
 }
 
-
-/*   user sections */
-export const signup = (data) => {
-  let objData = data
+export const requestIdentityUploadUrl = (data) => {
   return async (dispatch, getState) => {
     try {
-    //https://zentrixx-backend.onrender.com
-      const response = await fetch(`https://zentrixx-backend.onrender.com/signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-      })
-      if (response.status === 404) {
-        let data = await response.json()
+      const { userToken } = getState().userAuth;
+
+      const response = await fetch(
+        `http://localhost:8080/identity-upload-url/${userToken}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            header: userToken,
+          },
+          body: JSON.stringify(data),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
         return {
           bool: false,
-          message: data.response,
-          url: '/signup'
-        }
-      }
-      if (response.status === 300) {
-        let data = await response.json()
-
-        return {
-          bool: false,
-          message: data.response,
-          url: '/signup'
-        }
-      }
-      if (response.status === 301) {
-        let data = await response.json()
-
-        return {
-          bool: false,
-          message: data.response,
-          url: '/login'
-        }
+          message: result.response || result.message || 'Failed to request upload URL',
+        };
       }
 
-      if (response.status === 200) {
-        let data = await response.json()
-
-
-
-        localStorage.setItem("user", JSON.stringify(data.user))
-
-        localStorage.setItem("user_token", JSON.stringify(data.userToken))
-
-        localStorage.setItem("user_expiry", JSON.stringify(data.userExpiresIn))
-
-        let payloadData = {
-          user: data.user,
-          userToken: data.userToken,
-          userExpiresIn: data.userExpiresIn
-
-        }
-        dispatch({ type: LOGIN_USER, payload: payloadData })
-
-
-
-        return {
-          bool: true,
-          message: data.response,
-          url: `/verify/${data.user.email}`
-        }
-      }
-    } catch (err) {
+      return {
+        bool: true,
+        message: result.response || result,
+      };
+    } catch (error) {
       return {
         bool: false,
-        message: "network error",
-        url: '/signup'
+        message: error.message || 'Network error requesting upload URL',
+      };
+    }
+  };
+};
+/*   user sections */
+//https://zentrixx-backend.onrender.xxxcom
+export const signup = (data) => {
+  return async (dispatch) => {
+    try {
+      const response = await fetch(`http://localhost:8080/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        return {
+          bool: false,
+          message: result.response || result.message || "Unable to create your account. Please check your details.",
+          url: "/signup"
+        };
       }
 
+      const payload = {
+        user: result.user,
+        userToken: result.userToken,
+        userExpiresIn: result.userExpiresIn,
+        accounts: [],
+        cards: [],
+        loans: [],
+        histories: []
+      };
+
+      localStorage.setItem("user", JSON.stringify(result.user));
+      localStorage.setItem("user_token", JSON.stringify(result.userToken));
+      localStorage.setItem("user_expiry", JSON.stringify(result.userExpiresIn));
+      dispatch({ type: LOGIN_USER, payload });
+
+      return {
+        bool: true,
+        message: result.response || "Account created successfully.",
+        url: "/dashboard"
+      };
+    } catch (error) {
+      return {
+        bool: false,
+        message: "Network error. Please check your connection and try again.",
+        url: "/signup"
+      };
     }
-
-  }
-
-}
+  };
+};
 
 export const login = (data) => {
   return async (dispatch, getState) => {
     let userData = data
     //do some check on the server if its actually login before proceding to dispatch
     try {
-      const response = await fetch('https://zentrixx-backend.onrender.com/login', {
+      const response = await fetch('http://localhost:8080/login', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -257,7 +265,7 @@ export const login = (data) => {
 export const verifiedEmail = (data) => {
   return async (dispatch, getState) => {
     try {
-      const response = await fetch(`https://zentrixx-backend.onrender.com/emailverify`, {
+      const response = await fetch(`http://localhost:8080/emailverify`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -314,14 +322,14 @@ export const verifiedEmail = (data) => {
 }
 */
 
-//https://zentrixx-backend.onrender.com.com
+//http://localhost:8080.com
 
 //this one is the email verification page after signin up
 export const checkverification = (email) => {
   return async (dispatch, getState) => {
     //do some check on the server if its actually login before proceding to dispatch
     try {
-      const response = await fetch(`https://zentrixx-backend.onrender.com/checkverification/${email}`, {
+      const response = await fetch(`http://localhost:8080/checkverification/${email}`, {
         headers: {
           "Content-Type": "application/json",
         }
@@ -387,7 +395,7 @@ export const verifying = (token) => {
   return async (dispatch, getState) => {
     //do some check on the server if its actually login before proceding to dispatch
     try {
-      const response = await fetch(`https://zentrixx-backend.onrender.com/verifying/${token}`, {
+      const response = await fetch(`http://localhost:8080/verifying/${token}`, {
         headers: {
           "Content-Type": "application/json",
         }
@@ -448,7 +456,7 @@ export const sendRecoverEmail = (data) => {
   return async (dispatch, getState) => {
     //do some check on the server if its actually login before proceding to dispatch
     try {
-      const response = await fetch(`https://zentrixx-backend.onrender.com/recoverpassword`, {
+      const response = await fetch(`http://localhost:8080/recoverpassword`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -502,7 +510,7 @@ export const checkRecoverTokenValidity = (token) => {
   return async (dispatch, getState) => {
     //do some check on the server if its actually login before proceding to dispatch
     try {
-      const response = await fetch(`https://zentrixx-backend.onrender.com/checkrecovertokenvalidity/${token}`, {
+      const response = await fetch(`http://localhost:8080/checkrecovertokenvalidity/${token}`, {
         headers: {
           "Content-Type": "application/json",
         }
@@ -543,7 +551,7 @@ export const changePassword = (data) => {
   return async (dispatch, getState) => {
     //do some check on the server if its actually login before proceding to dispatch
     try {
-      const response = await fetch(`https://zentrixx-backend.onrender.com/changepassword/${data.token}`, {
+      const response = await fetch(`http://localhost:8080/changepassword/${data.token}`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -592,7 +600,7 @@ export const phoneSignup = (data) => {
       } = getState().userAuth
 
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/phonesignup/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/phonesignup/${userToken}`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -647,7 +655,7 @@ export const verifyPhone = (data) => {
 
       console.log(userToken)
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/verifyphone/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/verifyphone/${userToken}`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -695,112 +703,44 @@ export const verifyPhone = (data) => {
 
 export const registeration = (data) => {
   return async (dispatch, getState) => {
-    //do some check on the server if its actually login before proceding to dispatch
     try {
-      let {
-        userToken
-      } = getState().userAuth
-
-      const response = await fetch(`https://zentrixx-backend.onrender.com/registeration/${userToken}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: 'POST',
-        body: JSON.stringify(data),
-
-      })
-
-      if (response.status === 404) {
-        let data = await response.json()
-        return {
-          bool: false,
-          message: data.response,
-          url: '/registeration'
-        }
+      const { userToken } = getState().userAuth;
+      const response = await fetch(`http://localhost:8080/registeration/${userToken}`, {
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify(data)
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        return { bool: false, message: result.response || "Could not save your identity document." };
       }
-
-
-      if (response.status === 300) {
-        let data = await response.json()
-        return {
-          bool: false,
-          message: data.response,
-          url: '/registeration'
-        }
-      }
-
-
-      if (response.status === 200) {
-        let data = await response.json()
-        return {
-          bool: true,
-          message: data.response,
-          url: '/profilephoto'
-        }
-      }
-
-    } catch (err) {
-      return {
-        bool: false,
-        message: "network error"
-      }
+      return { bool: true, message: result.response || "Identity document saved." };
+    } catch (error) {
+      return { bool: false, message: "Network error while saving your identity document." };
     }
-  }
-}
+  };
+};
 
 export const profilePhoto = (data) => {
   return async (dispatch, getState) => {
-    //do some check on the server if its actually login before proceding to dispatch
     try {
-      let {
-        userToken
-      } = getState().userAuth
-
-      const response = await fetch(`https://zentrixx-backend.onrender.com/pofilephoto/${userToken}`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: 'POST',
-        body: JSON.stringify(data),
-
-      })
-
-      if (response.status === 404) {
-        let data = await response.json()
-        return {
-          bool: false,
-          message: data.response,
-          url: '/profilephoto'
-        }
+      const { userToken } = getState().userAuth;
+      const response = await fetch(`http://localhost:8080/pofilephoto/${userToken}`, {
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify(data)
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        return { bool: false, message: result.response || "Could not save your profile photo." };
       }
-
-
-      if (response.status === 300) {
-        let data = await response.json()
-        return {
-          bool: false,
-          message: data.response,
-          url: '/profilephoto'
-        }
-      }
-
-      if (response.status === 200) {
-        let data = await response.json()
-        return {
-          bool: true,
-          message: data.response,
-          url: '/success'
-        }
-      }
-
-    } catch (err) {
-      return {
-        bool: false,
-        message: "network error"
-      }
+      return { bool: true, message: result.response || "Profile photo saved." };
+    } catch (error) {
+      return { bool: false, message: "Network error while saving your profile photo." };
     }
-  }
-}
+  };
+};
+
 /*  Dashboard Routes  */
 
 //get user
@@ -815,7 +755,7 @@ export const hasCardFun = () => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/hascard/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/hascard/${userToken}`, {
         headers: {
           "Content-Type": "application/json",
           "header": `${userToken}`
@@ -870,7 +810,7 @@ export const createCard = (data) => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/createcard/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/createcard/${userToken}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -926,7 +866,7 @@ export const deleteCard = (id) => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/deletecard/${userToken}/${id}`, {
+      const response = await fetch(`http://localhost:8080/deletecard/${userToken}/${id}`, {
         method: 'DELETE',
         headers: {
           "Content-Type": "application/json",
@@ -978,7 +918,7 @@ export const fetchDeposits = () => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/withdraws/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/withdraws/${userToken}`, {
         headers: {
           "Content-Type": "application/json",
           "header": `${userToken}`
@@ -1026,7 +966,7 @@ export const createDeposits = (data) => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/deposits/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/deposits/${userToken}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -1076,7 +1016,7 @@ export const withdraws = (data) => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/withdraw/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/withdraw/${userToken}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -1147,7 +1087,7 @@ export const fetchWithdraw = () => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/withdraws/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/withdraws/${userToken}`, {
         headers: {
           "Content-Type": "application/json",
           "header": `${userToken}`
@@ -1194,7 +1134,7 @@ export const fetchAccounts = () => {
       let {
         userToken
       } = getState().userAuth
-      const response = await fetch(`https://zentrixx-backend.onrender.com/accounts/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/accounts/${userToken}`, {
         headers: {
           "Content-Type": "application/json",
           "header": `${userToken}`
@@ -1249,7 +1189,7 @@ export const submitTaxCode = (data) => {
 
       data.payment = paymentData
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/tax/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/tax/${userToken}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -1365,7 +1305,7 @@ export const submitBsaCode = (data) => {
       } = getState().userAuth
       data.payment = paymentData
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/bsa/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/bsa/${userToken}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -1480,7 +1420,7 @@ export const submitTacCode = (data) => {
       } = getState().userAuth
       data.payment = paymentData
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/tac/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/tac/${userToken}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -1595,7 +1535,7 @@ export const submitNrcCode = (data) => {
       } = getState().userAuth
       data.payment = paymentData
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/nrc/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/nrc/${userToken}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -1711,7 +1651,7 @@ export const submitImfCode = (data) => {
       } = getState().userAuth
       data.payment = paymentData
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/imf/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/imf/${userToken}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -1832,7 +1772,7 @@ export const submitCotCode = (data) => {
 
       data.payment = paymentData
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/cot/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/cot/${userToken}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -1956,7 +1896,7 @@ export const sendAccount = (data) => {
 
       dispatch({ type: DATA, payload: { ...data, url: 'sendAccount' } })
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/sendAccount/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/sendAccount/${userToken}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -2064,7 +2004,7 @@ export const sendAccountWithinBank = (data) => {
       dispatch({ type: DATA, payload: { ...data, url: 'sendAccountWithinBank' } })
 
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/sendAccountWithinBank/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/sendAccountWithinBank/${userToken}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -2171,7 +2111,7 @@ export const fetchTransfersAccount = (data) => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/transferstoaccount/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/transferstoaccount/${userToken}`, {
         headers: {
           "Content-Type": "application/json",
           "header": `${userToken}`
@@ -2218,7 +2158,7 @@ export const fetchAllAccount = (data) => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/allaccounts/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/allaccounts/${userToken}`, {
         headers: {
           "Content-Type": "application/json",
           "header": `${userToken}`
@@ -2265,7 +2205,7 @@ export const sendOtpCode = () => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/otpcode/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/otpcode/${userToken}`, {
         headers: {
           "Content-Type": "application/json",
           "header": `${userToken}`
@@ -2312,7 +2252,7 @@ export const submitOtpCode = (data) => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/otpcode/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/otpcode/${userToken}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -2362,7 +2302,7 @@ export const fetchAllBenefeciaries = () => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/beneficiaries/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/beneficiaries/${userToken}`, {
         headers: {
           "Content-Type": "application/json",
           "header": `${userToken}`
@@ -2408,7 +2348,7 @@ export const addBeneficiaries = (data) => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/beneficiaries/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/beneficiaries/${userToken}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -2459,7 +2399,7 @@ export const deleteBeneficiaries = (data) => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/beneficiaries/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/beneficiaries/${userToken}`, {
         method: 'DELETE',
         headers: {
           "Content-Type": "application/json",
@@ -2507,7 +2447,7 @@ export const fetchAllNotifications = () => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/notifications/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/notifications/${userToken}`, {
         headers: {
           "Content-Type": "application/json",
           "header": `${userToken}`
@@ -2553,7 +2493,7 @@ export const deleteNotification = (data) => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/notifications/${userToken}/${data._id}`, {
+      const response = await fetch(`http://localhost:8080/notifications/${userToken}/${data._id}`, {
         method: 'DELETE',
         headers: {
           "Content-Type": "application/json",
@@ -2602,7 +2542,7 @@ export const applyLoan = (data) => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/loan/${userToken}`, {
+      const response = await fetch(`http://localhost:8080/loan/${userToken}`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -2653,7 +2593,7 @@ export const fetchAdmin = () => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/admin`, {
+      const response = await fetch(`http://localhost:8080/admin`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -2704,7 +2644,7 @@ export const sendContactEmail = (data) => {
         userToken
       } = getState().userAuth
 
-      const response = await fetch(`https://zentrixx-backend.onrender.com/contact`, {
+      const response = await fetch(`http://localhost:8080/contact`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
