@@ -1,9 +1,0 @@
-.sideBar { width:232px;flex:0 0 232px;min-height:100vh;padding:25px 15px 22px;background:#fff;border-right:1px solid #e8edf3;overflow-y:auto;box-sizing:border-box; }
-.sideBar::before { content:"ZENTRIXX";display:block;margin:4px 10px 31px;color:#183452;font-size:15px;font-weight:850;letter-spacing:2px; }
-.sideBarMenu { display:flex;flex-direction:column;gap:5px; }
-.menu { display:flex;align-items:center;gap:11px;padding:11px 12px;margin:0;width:100%;border-radius:9px;cursor:pointer;transition:background .16s,color .16s; }
-.menu:hover { background:#f3f6fa; }.menu span { margin:0;color:#718198;font-size:19px; }.menu p { margin:0;color:#64748a;font-size:12px;font-weight:650; }
-.menu[style*="background-color"] { background:#edf3fa !important; }.menu[style*="background-color"] span { color:#315f96; }.menu[style*="background-color"] p { color:#244d7b;font-weight:750; }
-.sideBarInvite { display:none; }
-@media(max-width:900px) { .sideBar { width:205px;flex-basis:205px;padding:21px 10px; }.menu { padding:10px; } }
-@media(max-width:600px) { .sideBar { display:none; } }

@@ -364,14 +364,3 @@
     .mobilemenu { opacity: 0; visibility: hidden; transform: translateY(-8px); pointer-events: none; transition: opacity .18s ease, transform .18s ease, visibility .18s ease; }
     .mobilemenu.showmenu { top: 65px; opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; }
 }
-/* Workspace header refinements */
-.header { height:64px;margin:0;border-bottom:1px solid #e8edf3;background:#fff; }
-.header .innerheader { padding:0 25px;background:#fff; }
-.innerheaderleft { width:auto;min-width:0; }
-.innerheaderleft h2 { margin:0;padding:0;color:#21364e;font-size:15px;font-weight:750;letter-spacing:-.25px; }
-.innerheaderright { width:auto;gap:17px;justify-content:flex-end; }
-.innerheaderrightbutton { width:auto; }
-.deposit { height:37px;width:auto;padding:0 16px;border-radius:8px;background:#122d50;color:#fff;font-size:11px;font-weight:750; }
-.notification span { color:#718198;font-size:21px; }
-.notification .indicator { background:#d9b76c;top:1px;left:14px;width:7px;height:7px; }
-@media(max-width:480px) { .header .innerheader { padding:0 13px; }.innerheaderleft h2 { font-size:14px; }.innerheaderright { gap:10px; }.innerheaderright .hamburger { display:flex;align-items:center;justify-content:center;width:35px;height:35px;border:1px solid #e4eaf1;border-radius:8px;color:#345c89;background:#fff; }.innerheaderleft { width:auto; } }
