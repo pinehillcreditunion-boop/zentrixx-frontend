@@ -3,6 +3,7 @@ import { Route, Routes, Navigate } from "react-router-dom";
 
 import "./App.css";
 import "./brand-polish.css";
+import "./banking-dashboard-refresh.css";
 
 import FallBackComponent from "./components/Fallback";
 import ProtectedRoute from "./components/ProtectedRoute";

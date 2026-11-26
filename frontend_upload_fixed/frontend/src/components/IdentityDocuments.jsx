@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { MODIFY_USER, profilePhoto, registeration, requestIdentityUploadUrl } from "../store/action/userAppStorage";
+import { MODIFY_USER, profilePhoto, registeration, uploadIdentityFile } from "../store/action/userAppStorage";
 import styles from "./IdentityDocuments.module.css";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -59,20 +59,9 @@ function IdentityDocuments() {
   };
 
   const uploadToStorage = async (file, documentType) => {
-    const signed = await dispatch(requestIdentityUploadUrl({
-      fileName: file.name,
-      contentType: file.type,
-      documentType
-    }));
-    if (!signed.bool) throw new Error(signed.message);
-
-    const uploadResponse = await fetch(signed.message.uploadUrl, {
-      method: "PUT",
-      headers: { "Content-Type": file.type },
-      body: file
-    });
-    if (!uploadResponse.ok) throw new Error(`Could not upload your ${documentType === "identity" ? "ID document" : "profile photo"}. Check the storage bucket CORS settings and try again.`);
-    return signed.message.fileUrl;
+    const result = await dispatch(uploadIdentityFile(file, documentType));
+    if (!result.bool) throw new Error(result.message || "Upload failed. Please try again.");
+    return result.fileUrl;
   };
 
   const submit = async (event) => {

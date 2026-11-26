@@ -4,10 +4,8 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from 'react-router-dom';
 import SubmitBtn from '../components/Submit';
 import Loader from "../components/loader";
-import { profilePhoto } from '../store/action/userAppStorage';
+import { profilePhoto, uploadIdentityFile } from '../store/action/userAppStorage';
 import Modal from '../components/Modal/Modal';
-import ReactS3 from 'react-s3';
-window.Buffer = window.Buffer || require("buffer").Buffer;
 const imageMimeType = /image\/(png|jpg|jpeg)/i;
 
 
@@ -50,56 +48,33 @@ function ProfilePhotoPage() {
     const submitHandler = async (e) => {
         e.preventDefault()
         setIsLoading(true)
-        //uplaoding photo to aws
-        let imgUrl
-
-        const config = {
-            dirName: process.env.REACT_APP_AWS_DIR_NAME,
-            bucketName: process.env.REACT_APP_AWS_BUCKET_NAME,
-            region: process.env.REACT_APP_AWS_REGION,
-            accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-            secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-        };
-
-        let upload = async () => {
-            if (!photo) {
-                return
+        let imgUrl = "";
+        if (photo) {
+            const uploadResult = await dispatch(uploadIdentityFile(photo, "profile"));
+            if (!uploadResult.bool) {
+                setIsLoading(false);
+                setIsError(true);
+                setIsErrorInfo(uploadResult.message);
+                return;
             }
-
-            return ReactS3.uploadFile(photo, config).then(response => {
-
-                if (response.result.status !== 204)
-                    throw new Error("Failed to upload image to S3");
-                else {
-
-                    imgUrl = (response.location)
-                }
-            })
-                .catch(error => {
-                    console.log(error);
-                })
+            imgUrl = uploadResult.fileUrl;
         }
-
-
-
-        await upload()
 
         let response = await dispatch(profilePhoto({
             profilePhotoUrl: imgUrl
         }))
 
 
-        if (!response.bool) {
-            setIsLoading(false)
-            setIsError(true)
-            setIsErrorInfo(response.message)
-            setIsUrl(response.url)
-        }
-
-        setIsLoading(false)
-        setIsError(true)
-        setIsErrorInfo(response.message)
-        setIsUrl(response.url)
+        setIsLoading(false);
+        setIsError(true);
+        setIsErrorInfo(response.message || (response.bool ? "Your profile photo was saved." : "Could not save your profile photo."));
+        setIsUrl(response.bool ? "/dashboard" : (response.url || ""));
+    } catch (error) {
+        setIsLoading(false);
+        setIsError(true);
+        setIsErrorInfo(error.message || "Upload or save failed. Please try again.");
+        setIsUrl("");
+    }
 
     }
 
@@ -115,9 +90,10 @@ function ProfilePhotoPage() {
 
 
     const changePhotoHandler = (e) => {
-        const file = e.target.files[0];
-        if (!file.type.match(imageMimeType)) {
-            alert("Image mime type is not valid");
+        const file = e.target.files?.[0];
+        if (!file || !imageMimeType.test(file.type) || file.size > 5 * 1024 * 1024) {
+            alert("Choose a JPG or PNG image up to 5 MB.");
+            e.target.value = "";
             return;
         }
         setIsChangePhoto(true)

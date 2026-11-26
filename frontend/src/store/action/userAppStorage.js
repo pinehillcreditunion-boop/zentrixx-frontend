@@ -755,6 +755,8 @@ export const hasCardFun = () => {
         userToken
       } = getState().userAuth
 
+      //https://zentrixx-backend.onrender.com
+
       const response = await fetch(`https://zentrixx-backend.onrender.com/hascard/${userToken}`, {
         headers: {
           "Content-Type": "application/json",

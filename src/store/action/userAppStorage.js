@@ -46,41 +46,62 @@ let retrievedAdminStoredToken = () => {
 export const requestIdentityUploadUrl = (data) => {
   return async (dispatch, getState) => {
     try {
-      const { userToken } = getState().userAuth;
-
-      const response = await fetch(
-        `https://zentrixx-backend.onrender.com/identity-upload-url/${userToken}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            header: userToken,
-          },
-          body: JSON.stringify(data),
-        }
-      );
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        return {
-          bool: false,
-          message: result.response || result.message || 'Failed to request upload URL',
-        };
-      }
-
-      return {
-        bool: true,
-        message: result.response || result,
-      };
+      const { userToken } = getState().userAuth || {};
+      if (!userToken) return { bool: false, message: "Your session has expired. Please log in again." };
+      const response = await fetch(`https://zentrixx-backend.onrender.com/identity-upload-url/${encodeURIComponent(userToken)}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", header: userToken },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) return { bool: false, message: result.response || result.message || `Upload preparation failed (${response.status}).` };
+      const payload = result.response && typeof result.response === "object" ? result.response : result;
+      if (!payload.uploadUrl || !payload.fileUrl) return { bool: false, message: "The upload service returned an incomplete response. Please retry." };
+      return { bool: true, message: payload };
     } catch (error) {
-      return {
-        bool: false,
-        message: error.message || 'Network error requesting upload URL',
-      };
+      return { bool: false, message: error.message || "Network error requesting upload URL." };
     }
   };
 };
+
+// Secure direct-to-S3 upload: no AWS credentials are exposed to the browser.
+export const uploadIdentityFile = (file, documentType) => async (dispatch) => {
+  const allowed = ["image/jpeg", "image/png", "image/webp"];
+  const maxSize = 5 * 1024 * 1024;
+  if (!file || !allowed.includes(file.type)) return { bool: false, message: "Choose a JPG, PNG or WEBP image." };
+  if (file.size <= 0 || file.size > maxSize) return { bool: false, message: "Image must be between 1 byte and 5 MB." };
+
+  // Retry transient failures. Each attempt obtains a fresh URL to avoid expired signatures.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const signed = await dispatch(requestIdentityUploadUrl({ contentType: file.type, documentType, fileSize: file.size }));
+    if (!signed.bool) return signed;
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 90000);
+      let response;
+      try {
+        response = await fetch(signed.message.uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type },
+          body: file,
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timeout);
+      }
+      if (response.ok) return { bool: true, fileUrl: signed.message.fileUrl, key: signed.message.key };
+      const errorBody = await response.text().catch(() => "");
+      const detail = errorBody.match(/<Message>(.*?)<\/Message>/i)?.[1] || errorBody.match(/<Code>(.*?)<\/Code>/i)?.[1];
+      const retryable = response.status === 408 || response.status === 429 || response.status >= 500;
+      if (!retryable || attempt === 2) return { bool: false, message: detail ? `S3 upload rejected: ${detail}` : `Image upload failed (${response.status}). Please retry.` };
+    } catch (error) {
+      if (attempt === 2) return { bool: false, message: error.name === "AbortError" ? "Image upload timed out. Try a smaller image or a better connection." : "Network connection interrupted during image upload. Please retry." };
+    }
+    await new Promise(resolve => setTimeout(resolve, 500 * (attempt + 1)));
+  }
+  return { bool: false, message: "Image upload failed after retries. Please try again." };
+};
+
 /*   user sections */
 //https://zentrixx-backend.onrender.com
 export const signup = (data) => {
@@ -755,7 +776,7 @@ export const hasCardFun = () => {
         userToken
       } = getState().userAuth
 
-      //https://zentrixx-backend.onrender.com
+      //https://zentrixx-backend.onrenderxxx.com
 
       const response = await fetch(`https://zentrixx-backend.onrender.com/hascard/${userToken}`, {
         headers: {
