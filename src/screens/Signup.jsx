@@ -78,6 +78,9 @@ function SignupPage() {
     setStep((current) => Math.max(current - 1, 0));
   };
 
+  
+  
+  
   const submit = async (event) => {
     event.preventDefault();
     const message = validateStep();
@@ -108,7 +111,7 @@ function SignupPage() {
         setLoading(false);
         return;
       }
-      navigate("/dashboard", { replace: true });
+      navigate("/login", { replace: true });
     } catch (err) {
       setError(err?.message || "A network error occurred. Please try again.");
       setLoading(false);
