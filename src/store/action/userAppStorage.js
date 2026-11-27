@@ -754,7 +754,7 @@ export const profilePhoto = (data) => {
 
 export const hasCardFun = () => {
   return async (dispatch, getState) => {
-    //do some check on the server if its actually login before proceding to dispatch
+    //do some check on the server if its actually login before proceding to dispatchh
     try {
       let {
         userToken
