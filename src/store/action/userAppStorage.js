@@ -1,3 +1,6 @@
+import ReactS3 from "react-s3";
+window.Buffer = window.Buffer || require("buffer").Buffer;
+
 export const SIGNUP_USER = "SIGNUP_USER";
 export const LOGIN_USER = "LOGIN_USER";
 export const MODIFY_USER = "MODIFY_USER";
@@ -43,86 +46,44 @@ let retrievedAdminStoredToken = () => {
   }
 }
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-export const requestIdentityUploadUrl = (data) => {
-  return async (dispatch, getState) => {
-    const { userToken } = getState().userAuth || {};
-    if (!userToken) return { bool: false, message: "Your session has expired. Please log in again." };
-
-    // Render can take time to wake up. Give URL preparation its own timeout and
-    // retry transient network/server responses instead of failing immediately.
-    for (let attempt = 0; attempt < 3; attempt++) {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 60000);
-      try {
-        const response = await fetch(`https://zentrixx-backend.onrender.com/identity-upload-url/${encodeURIComponent(userToken)}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", header: userToken },
-          body: JSON.stringify(data),
-          signal: controller.signal,
-        });
-        const result = await response.json().catch(() => ({}));
-        if (response.ok) {
-          const payload = result.response && typeof result.response === "object" ? result.response : result;
-          if (!payload.uploadUrl || !payload.fileUrl) return { bool: false, message: "The upload service returned an incomplete response. Please retry." };
-          return { bool: true, message: payload };
-        }
-        const retryable = response.status === 408 || response.status === 429 || response.status >= 500;
-        if (!retryable || attempt === 2) {
-          return { bool: false, message: result.response || result.message || `Upload preparation failed (${response.status}).` };
-        }
-      } catch (error) {
-        if (attempt === 2) {
-          return { bool: false, message: error.name === "AbortError" ? "The upload service took too long to respond. Please retry." : "Network error requesting upload URL. Please check your connection and retry." };
-        }
-      } finally {
-        clearTimeout(timeout);
-      }
-      await sleep(500 * (attempt + 1));
-    }
-    return { bool: false, message: "Unable to prepare upload after retries. Please try again." };
-  };
-};
-
-// Secure direct-to-S3 upload: no AWS credentials are exposed to the browser.
-export const uploadIdentityFile = (file, documentType) => async (dispatch) => {
+// Dashboard image uploads use the same direct-to-S3 ReactS3 flow as the
+// supplied JBank reference application. AWS configuration is read from
+// frontend environment variables (REACT_APP_AWS_*).
+export const uploadIdentityFile = (file, documentType) => async () => {
   const allowed = ["image/jpeg", "image/png", "image/webp"];
   const maxSize = 5 * 1024 * 1024;
-  if (!file || !allowed.includes(file.type)) return { bool: false, message: "Choose a JPG, PNG or WEBP image." };
-  if (file.size <= 0 || file.size > maxSize) return { bool: false, message: "Image must be between 1 byte and 5 MB." };
-  if (!["identity", "profile"].includes(documentType)) return { bool: false, message: "Invalid upload type." };
-
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const signed = await dispatch(requestIdentityUploadUrl({ contentType: file.type, documentType, fileSize: file.size }));
-    if (!signed.bool) return signed;
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 90000);
-    try {
-      const response = await fetch(signed.message.uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": file.type },
-        body: file,
-        signal: controller.signal,
-      });
-      if (response.ok) return { bool: true, fileUrl: signed.message.fileUrl, key: signed.message.key };
-
-      const errorBody = await response.text().catch(() => "");
-      const detail = errorBody.match(/<Message>(.*?)<\/Message>/i)?.[1] || errorBody.match(/<Code>(.*?)<\/Code>/i)?.[1];
-      // A new signed URL is useful for transient failures. Avoid retrying most
-      // client-side rejections, which require configuration or input changes.
-      const retryable = response.status === 408 || response.status === 429 || response.status >= 500;
-      if (!retryable || attempt === 2) {
-        return { bool: false, message: detail ? `S3 upload rejected: ${detail}` : `Image upload failed (${response.status}). Please retry.` };
-      }
-    } catch (error) {
-      if (attempt === 2) return { bool: false, message: error.name === "AbortError" ? "Image upload timed out. Try a smaller image or a better connection." : "Network connection interrupted during image upload. Please retry." };
-    } finally {
-      clearTimeout(timeout);
-    }
-    await sleep(500 * (attempt + 1));
+  if (!file || !allowed.includes(file.type)) {
+    return { bool: false, message: "Choose a JPG, PNG or WEBP image." };
   }
-  return { bool: false, message: "Image upload failed after retries. Please try again." };
+  if (file.size <= 0 || file.size > maxSize) {
+    return { bool: false, message: "Image must be between 1 byte and 5 MB." };
+  }
+  if (!["identity", "profile"].includes(documentType)) {
+    return { bool: false, message: "Invalid upload type." };
+  }
+
+  const config = {
+    dirName: process.env.REACT_APP_AWS_DIR_NAME,
+    bucketName: process.env.REACT_APP_AWS_BUCKET_NAME,
+    region: process.env.REACT_APP_AWS_REGION,
+    accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+  };
+
+  if (!config.dirName || !config.bucketName || !config.region || !config.accessKeyId || !config.secretAccessKey) {
+    return { bool: false, message: "AWS image upload is not configured. Please contact support." };
+  }
+
+  try {
+    const response = await ReactS3.uploadFile(file, config);
+    if (!response || !response.result || response.result.status !== 204 || !response.location) {
+      throw new Error("AWS did not return a successful image URL.");
+    }
+    return { bool: true, fileUrl: response.location, key: response.key };
+  } catch (error) {
+    console.error("Direct S3 image upload failed:", error);
+    return { bool: false, message: error.message || "Image upload to AWS failed. Please try again." };
+  }
 };
 
 /*   user sections */
@@ -799,7 +760,7 @@ export const hasCardFun = () => {
         userToken
       } = getState().userAuth
 
-      //https://zentrixx-backend.onrenderxxx.com
+      //https://zentrixx-backend.onrender.com
 
       const response = await fetch(`https://zentrixx-backend.onrender.com/hascard/${userToken}`, {
         headers: {
