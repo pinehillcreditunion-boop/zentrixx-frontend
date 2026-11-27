@@ -43,24 +43,45 @@ let retrievedAdminStoredToken = () => {
   }
 }
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const requestIdentityUploadUrl = (data) => {
   return async (dispatch, getState) => {
-    try {
-      const { userToken } = getState().userAuth || {};
-      if (!userToken) return { bool: false, message: "Your session has expired. Please log in again." };
-      const response = await fetch(`https://zentrixx-backend.onrender.com/identity-upload-url/${encodeURIComponent(userToken)}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", header: userToken },
-        body: JSON.stringify(data),
-      });
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) return { bool: false, message: result.response || result.message || `Upload preparation failed (${response.status}).` };
-      const payload = result.response && typeof result.response === "object" ? result.response : result;
-      if (!payload.uploadUrl || !payload.fileUrl) return { bool: false, message: "The upload service returned an incomplete response. Please retry." };
-      return { bool: true, message: payload };
-    } catch (error) {
-      return { bool: false, message: error.message || "Network error requesting upload URL." };
+    const { userToken } = getState().userAuth || {};
+    if (!userToken) return { bool: false, message: "Your session has expired. Please log in again." };
+
+    // Render can take time to wake up. Give URL preparation its own timeout and
+    // retry transient network/server responses instead of failing immediately.
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 60000);
+      try {
+        const response = await fetch(`https://zentrixx-backend.onrender.com/identity-upload-url/${encodeURIComponent(userToken)}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", header: userToken },
+          body: JSON.stringify(data),
+          signal: controller.signal,
+        });
+        const result = await response.json().catch(() => ({}));
+        if (response.ok) {
+          const payload = result.response && typeof result.response === "object" ? result.response : result;
+          if (!payload.uploadUrl || !payload.fileUrl) return { bool: false, message: "The upload service returned an incomplete response. Please retry." };
+          return { bool: true, message: payload };
+        }
+        const retryable = response.status === 408 || response.status === 429 || response.status >= 500;
+        if (!retryable || attempt === 2) {
+          return { bool: false, message: result.response || result.message || `Upload preparation failed (${response.status}).` };
+        }
+      } catch (error) {
+        if (attempt === 2) {
+          return { bool: false, message: error.name === "AbortError" ? "The upload service took too long to respond. Please retry." : "Network error requesting upload URL. Please check your connection and retry." };
+        }
+      } finally {
+        clearTimeout(timeout);
+      }
+      await sleep(500 * (attempt + 1));
     }
+    return { bool: false, message: "Unable to prepare upload after retries. Please try again." };
   };
 };
 
@@ -70,34 +91,36 @@ export const uploadIdentityFile = (file, documentType) => async (dispatch) => {
   const maxSize = 5 * 1024 * 1024;
   if (!file || !allowed.includes(file.type)) return { bool: false, message: "Choose a JPG, PNG or WEBP image." };
   if (file.size <= 0 || file.size > maxSize) return { bool: false, message: "Image must be between 1 byte and 5 MB." };
+  if (!["identity", "profile"].includes(documentType)) return { bool: false, message: "Invalid upload type." };
 
-  // Retry transient failures. Each attempt obtains a fresh URL to avoid expired signatures.
   for (let attempt = 0; attempt < 3; attempt++) {
     const signed = await dispatch(requestIdentityUploadUrl({ contentType: file.type, documentType, fileSize: file.size }));
     if (!signed.bool) return signed;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 90000);
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 90000);
-      let response;
-      try {
-        response = await fetch(signed.message.uploadUrl, {
-          method: "PUT",
-          headers: { "Content-Type": file.type },
-          body: file,
-          signal: controller.signal,
-        });
-      } finally {
-        clearTimeout(timeout);
-      }
+      const response = await fetch(signed.message.uploadUrl, {
+        method: "PUT",
+        headers: { "Content-Type": file.type },
+        body: file,
+        signal: controller.signal,
+      });
       if (response.ok) return { bool: true, fileUrl: signed.message.fileUrl, key: signed.message.key };
+
       const errorBody = await response.text().catch(() => "");
       const detail = errorBody.match(/<Message>(.*?)<\/Message>/i)?.[1] || errorBody.match(/<Code>(.*?)<\/Code>/i)?.[1];
+      // A new signed URL is useful for transient failures. Avoid retrying most
+      // client-side rejections, which require configuration or input changes.
       const retryable = response.status === 408 || response.status === 429 || response.status >= 500;
-      if (!retryable || attempt === 2) return { bool: false, message: detail ? `S3 upload rejected: ${detail}` : `Image upload failed (${response.status}). Please retry.` };
+      if (!retryable || attempt === 2) {
+        return { bool: false, message: detail ? `S3 upload rejected: ${detail}` : `Image upload failed (${response.status}). Please retry.` };
+      }
     } catch (error) {
       if (attempt === 2) return { bool: false, message: error.name === "AbortError" ? "Image upload timed out. Try a smaller image or a better connection." : "Network connection interrupted during image upload. Please retry." };
+    } finally {
+      clearTimeout(timeout);
     }
-    await new Promise(resolve => setTimeout(resolve, 500 * (attempt + 1)));
+    await sleep(500 * (attempt + 1));
   }
   return { bool: false, message: "Image upload failed after retries. Please try again." };
 };

@@ -83,8 +83,11 @@ function IdentityDocuments() {
       let identityUrl = user?.passportUrl || "";
       let profileUrl = user?.profilePhotoUrl || "";
 
-      if (identityFile) identityUrl = await uploadToStorage(identityFile, "identity");
-      if (profileFile) profileUrl = await uploadToStorage(profileFile, "profile");
+      // Upload both selected images concurrently to reduce total waiting time.
+      const uploadTasks = [];
+      if (identityFile) uploadTasks.push(uploadToStorage(identityFile, "identity").then((url) => { identityUrl = url; }));
+      if (profileFile) uploadTasks.push(uploadToStorage(profileFile, "profile").then((url) => { profileUrl = url; }));
+      await Promise.all(uploadTasks);
 
       if (identityFile) {
         const savedIdentity = await dispatch(registeration({
